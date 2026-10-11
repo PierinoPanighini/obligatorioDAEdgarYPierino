@@ -1,0 +1,51 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #f3f6f4;
+  color: #18332d;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.demo {
+  width: min(100% - 2rem, 36rem);
+  margin: 4rem auto;
+  padding: 2rem;
+  background: #fff;
+  border: 1px solid #d8e2dc;
+  border-radius: 6px;
+}
+
+h1 {
+  margin: 0 0 1.5rem;
+  font-size: 1.5rem;
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+button {
+  min-height: 2.75rem;
+  padding: 0.6rem 1rem;
+  border: 1px solid #176b57;
+  border-radius: 4px;
+  background: #176b57;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #105442;
+}
+
+button:focus-visible {
+  outline: 3px solid #e6a33b;
+  outline-offset: 2px;
+}
