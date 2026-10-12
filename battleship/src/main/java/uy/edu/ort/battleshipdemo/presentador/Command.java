@@ -1,4 +1,4 @@
-package uy.edu.ort.battleshipdemo;
+package uy.edu.ort.battleshipdemo.presentador;
 
 import lombok.Getter;
 
