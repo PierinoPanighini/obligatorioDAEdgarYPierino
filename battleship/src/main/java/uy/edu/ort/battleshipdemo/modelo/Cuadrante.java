@@ -5,9 +5,9 @@ public class Cuadrante {
     private int fila;
     private int columna;
 
-    //Barco que ocupa esta celda. Si es null, la celda es agua.
+    //Barco que ocupa esta celda, si es null, la celda es agua.
     private Barco barco;
-    // true si ya recibió un disparo.
+
     private boolean disparado;
 
     public Cuadrante(int fila, int columna) {
@@ -39,8 +39,24 @@ public class Cuadrante {
         return disparado;
     }
 
-    public void setDisparado(boolean disparado) {
-        this.disparado = disparado;
+    public boolean estaOcupado() {
+        return barco != null;
+    }
+
+    // Marca la celda como disparada y devuelve el resultado.
+    // Si el disparo alcanza la ultima parte sana, el barco queda hundido.
+    public ResultadoDisparo recibirDisparo() throws BatallaNavalException {
+        if (disparado) {
+            throw new BatallaNavalException("Esa celda ya fue disparada");
+        }
+        disparado = true;
+        if (!estaOcupado()) {
+            return ResultadoDisparo.AGUA;
+        }
+        if (barco.estaHundido()) {
+            return ResultadoDisparo.HUNDIDO;
+        }
+        return ResultadoDisparo.IMPACTO;
     }
 
 }

@@ -16,5 +16,5 @@ public abstract class Tactica {
      * Selecciona un cuadrante que todavia no haya recibido un disparo.
      * La seleccion no marca el cuadrante como disparado.
      */
-    public abstract Cuadrante elegirCuadrante(Oceano oceano);
+    public abstract Cuadrante elegirCuadrante(Oceano oceano) throws BatallaNavalException;
 }
