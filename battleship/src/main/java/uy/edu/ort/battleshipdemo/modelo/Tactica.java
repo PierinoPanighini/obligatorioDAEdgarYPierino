@@ -17,4 +17,6 @@ public abstract class Tactica {
      * La seleccion no marca el cuadrante como disparado.
      */
     public abstract Cuadrante elegirCuadrante(Oceano oceano) throws BatallaNavalException;
+
+    public abstract Tactica crearNueva(); //metodo fabrica para crear una nueva instancia de la misma clase de la tactica.
 }

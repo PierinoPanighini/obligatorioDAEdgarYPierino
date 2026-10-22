@@ -17,6 +17,11 @@ public class TacticaCazaAtaque extends Tactica {
         this.azar = new Random();
     }
 
+    @Override 
+    public Tactica crearNueva() {
+        return new TacticaCazaAtaque();
+    } // nueva instancia de la misma clase de la tactica.
+
     @Override
     public Cuadrante elegirCuadrante(Oceano oceano) throws BatallaNavalException {
         actualizarImpactos();

@@ -5,6 +5,11 @@ public class TacticaEspiral extends Tactica {
     public TacticaEspiral() {
         super("Espiral");
     }
+    
+    @Override 
+    public Tactica crearNueva() {
+        return new TacticaEspiral();
+    } // nueva instancia de la misma clase de la tactica.
 
     @Override
     public Cuadrante elegirCuadrante(Oceano oceano) throws BatallaNavalException {
