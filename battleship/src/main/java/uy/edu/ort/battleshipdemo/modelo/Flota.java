@@ -35,4 +35,21 @@ public class Flota {
         }
         return true;
     }
+
+    public int tamanioTotal() {
+        int total = 0;
+        for (Barco barco : barcos) {
+            total = total + barco.getTamanio();
+        }
+        return total;
+    }
+
+    public int partesSanas(){
+        int total = 0;
+        for (Barco barco : barcos) {
+            total = total + barco.partesSanas();
+        }
+        return total;
+    }
+
 }
