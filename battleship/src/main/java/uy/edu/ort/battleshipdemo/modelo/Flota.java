@@ -26,4 +26,13 @@ public class Flota {
         }
         return equivalente;
     }
+
+    public boolean quedoTodaHundida() {
+        for (Barco barco : barcos) {
+            if (!barco.estaHundido()) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

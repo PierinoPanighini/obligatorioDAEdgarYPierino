@@ -3,7 +3,6 @@ package uy.edu.ort.battleshipdemo.modelo;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class Batalla {
 
     private int id;
@@ -20,9 +19,11 @@ public class Batalla {
     private List<Barco> bajasAmigas;
 
     /**
-     Creamos batalla nueva con estado EN_PREPARACION. Se le asigna lugar, táctica, flota y océanos.
+     * Creamos batalla nueva con estado EN_PREPARACION. Se le asigna lugar, táctica,
+     * flota y océanos.
      */
-    public Batalla(int id, String lugar, Tactica tactica, Flota flotaJugador, Flota flotaMaquina, Oceano oceanoJugador, Oceano oceanoMaquina) {
+    public Batalla(int id, String lugar, Tactica tactica, Flota flotaJugador, Flota flotaMaquina, Oceano oceanoJugador,
+            Oceano oceanoMaquina) {
         this.id = id;
         this.lugar = lugar;
         this.tactica = tactica;
@@ -56,7 +57,6 @@ public class Batalla {
         return flotaMaquina;
     }
 
-
     public Oceano getOceanoJugador() {
         return oceanoJugador;
     }
@@ -69,7 +69,7 @@ public class Batalla {
         return estado;
     }
 
-//SETTERS
+    // SETTERS
     public void setEstado(EstadoBatalla estado) {
         this.estado = estado;
     }
@@ -80,6 +80,34 @@ public class Batalla {
 
     public List<Barco> getBajasEnemigas() {
         return bajasEnemigas;
+    }
+
+    public synchronized void disparar(int fila, int columna) throws BatallaNavalException {
+        if (estado != EstadoBatalla.EN_COMBATE) {
+            throw new BatallaNavalException("La batalla no está en combate.");
+        }
+        Disparo disparoJugador = disparar(oceanoMaquina.getCuadrante(fila, columna));
+        if (disparoJugador.getResultado() == ResultadoDisparo.HUNDIDO) {
+            bajasEnemigas.add(disparoJugador.getCuadrante().getBarco());
+        }
+        Disparo disparoMaquina = null;
+        if (flotaMaquina.quedoTodaHundida()) {
+            estado = EstadoBatalla.GANADA;
+        } else {
+            Cuadrante elegido = tactica.elegirCuadrante(oceanoJugador);
+            disparoMaquina = disparar(elegido);
+            if (flotaJugador.quedoTodaHundida()) {
+                estado = EstadoBatalla.PERDIDA;
+            }
+        }
+        rondas.add(new Ronda(rondas.size() + 1, disparoJugador, disparoMaquina));
+    }
+
+    // Disparar es igual para el humano y para la máquina: solo cambia quién elige
+    // el cuadrante.
+    private Disparo disparar(Cuadrante cuadrante) throws BatallaNavalException {
+        ResultadoDisparo resultado = cuadrante.recibirDisparo();
+        return new Disparo(cuadrante, resultado);
     }
 
 }
