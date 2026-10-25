@@ -23,7 +23,8 @@ public class TacticaCazaAtaque extends Tactica {
     } // nueva instancia de la misma clase de la tactica.
 
     @Override
-    public Cuadrante elegirCuadrante(Oceano oceano) throws BatallaNavalException {
+    public Cuadrante elegirCuadrante() throws BatallaNavalException {
+        Oceano oceano = getOceanoObjetivo();
         actualizarImpactos();
         Cuadrante elegido = null;
         if (!impactos.isEmpty()) { // estoy en modo ataque
