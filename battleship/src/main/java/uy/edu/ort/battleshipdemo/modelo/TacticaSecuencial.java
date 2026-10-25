@@ -6,9 +6,23 @@ public class TacticaSecuencial extends Tactica {
         super("Secuencial");
     }
 
+    @Override 
+    public Tactica crearNueva() {
+        return new TacticaSecuencial();
+    } // nueva instancia de la misma clase de la tactica.
+
     @Override
-    public Cuadrante elegirCuadrante(Oceano oceano) {
-        // TODO: implementar el algoritmo de esta tactica.
-        throw new UnsupportedOperationException("El algoritmo Secuencial todavia no esta implementado.");
+    public Cuadrante elegirCuadrante(Oceano oceano) throws BatallaNavalException {
+        for (int fila = 0; fila < oceano.getFilas(); fila++) {
+            for (int columna = 0; columna < oceano.getColumnas(); columna++) {
+                Cuadrante cuadrante = oceano.getCuadrante(fila, columna);
+
+                if (!cuadrante.isDisparado()) {
+                    return cuadrante;
+                }
+            }
+        }
+        throw new BatallaNavalException("No hay cuadrantes disponibles para disparar");
     }
+
 }

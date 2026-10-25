@@ -31,10 +31,16 @@ public class Oceano {
     }
 
     public Cuadrante getCuadrante(int fila, int columna) {
-        if (fila < 0 || fila >= filas || columna < 0 || columna >= columnas) {
-            throw new IllegalArgumentException("Las coordenadas estan fuera del oceano.");//FIXME: CHEQUEAR EXCEPCION
+        if (!estaDentro(fila, columna)) {
+            throw new IllegalArgumentException("Las coordenadas estan fuera del oceano.");//
+            //cambiè el if para usar el metodo estaDentro
+            //FIXME: CHEQUEAR EXCEPCION
         }
 
         return cuadrantes[fila][columna];
+    }
+
+    public boolean estaDentro(int fila, int columna) {
+        return fila >= 0 && fila < filas && columna >= 0 && columna < columnas;
     }
 }

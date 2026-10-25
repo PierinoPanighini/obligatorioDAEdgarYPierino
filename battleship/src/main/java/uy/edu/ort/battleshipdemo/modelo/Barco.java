@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /*
-Un barco de la flota de un jugador.Su nombre y tamaño los conoce su TipoBarco (Experto).
+Su nombre y tamaño los conoce su TipoBarco.
  */
 public class Barco {
 
@@ -30,12 +30,46 @@ public class Barco {
         return orientacion;
     }
 
-    //la orientación se elige recién al ubicar el barco.
-    public void setOrientacion(Orientacion orientacion) {
-        this.orientacion = orientacion;
-    }
-
     public List<Cuadrante> getCuadrantes() {
         return cuadrantes;
+    }
+
+    public String getNombre() {
+        return tipoBarco.getNombre();
+    }
+
+    public int getTamanio() {
+        return tipoBarco.getTamanio();
+    }
+
+    // Recibe los cuadrantes ya validados por el oceano, empezando por la proa.
+    public void ubicar(List<Cuadrante> cuadrantesAOcupar, Orientacion orientacion) {
+        this.orientacion = orientacion;
+        for (Cuadrante cuadrante : cuadrantesAOcupar) {
+            cuadrantes.add(cuadrante);
+            cuadrante.setBarco(this);
+        }
+    }
+
+    public boolean estaUbicado() {
+        return !cuadrantes.isEmpty();
+    }
+
+    // Un barco está sano porq aun no lo ubicaron, y está roto si su cuadrante fue disparado
+    public int partesSanas() {
+        if (!estaUbicado()) {
+            return getTamanio();
+        }
+        int sanas = 0;
+        for (Cuadrante cuadrante : cuadrantes) {
+            if (!cuadrante.isDisparado()) {
+                sanas++;
+            }
+        }
+        return sanas;
+    }
+
+    public boolean estaHundido() {
+        return estaUbicado() && partesSanas() == 0;
     }
 }
