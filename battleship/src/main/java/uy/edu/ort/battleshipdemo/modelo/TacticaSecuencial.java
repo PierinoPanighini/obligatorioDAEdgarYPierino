@@ -12,7 +12,8 @@ public class TacticaSecuencial extends Tactica {
     } // nueva instancia de la misma clase de la tactica.
 
     @Override
-    public Cuadrante elegirCuadrante(Oceano oceano) throws BatallaNavalException {
+    public Cuadrante elegirCuadrante() throws BatallaNavalException {
+        Oceano oceano = getOceanoObjetivo();
         for (int fila = 0; fila < oceano.getFilas(); fila++) {
             for (int columna = 0; columna < oceano.getColumnas(); columna++) {
                 Cuadrante cuadrante = oceano.getCuadrante(fila, columna);

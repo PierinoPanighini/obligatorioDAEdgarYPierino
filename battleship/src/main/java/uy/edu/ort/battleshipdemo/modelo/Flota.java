@@ -7,11 +7,22 @@ public class Flota {
 
     private List<Barco> barcos;
 
-    public Flota() {
-        this.barcos = new ArrayList<>();
+    public Flota(List<Barco> barcos) {
+        if (barcos == null || barcos.isEmpty()) {
+            throw new IllegalArgumentException("La flota debe contener al menos un barco.");
+        }
+        for (Barco barco : barcos) {
+            if (barco == null) {
+                throw new IllegalArgumentException("La flota no puede tener barcos nulos.");
+            }
+        }
+        this.barcos = new ArrayList<>(barcos);
     }
 
     public void agregarBarco(Barco barco) {
+        if (barco == null) {
+            throw new IllegalArgumentException("El barco no puede ser nulo.");
+        }
         this.barcos.add(barco);
     }
 
@@ -20,10 +31,10 @@ public class Flota {
     }
 
     public Flota crearFlotaEquivalente() {
-        Flota equivalente = new Flota();
+        List<Barco> equivalentes = new ArrayList<>();
         for (Barco barco : barcos) {
-            equivalente.agregarBarco(new Barco(barco.getTipoBarco()));
+            equivalentes.add(new Barco(barco.getTipoBarco()));
         }
-        return equivalente;
+        return new Flota(equivalentes);
     }
 }

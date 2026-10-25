@@ -12,7 +12,8 @@ public class TacticaEspiral extends Tactica {
     } // nueva instancia de la misma clase de la tactica.
 
     @Override
-    public Cuadrante elegirCuadrante(Oceano oceano) throws BatallaNavalException {
+    public Cuadrante elegirCuadrante() throws BatallaNavalException {
+        Oceano oceano = getOceanoObjetivo();
         int fila = oceano.getFilas() / 2;
         int columna = (oceano.getColumnas() - 1) / 2;
         int direccion = 0; // 0: derecha, 1: abajo, 2: izquierda, 3: arriba
