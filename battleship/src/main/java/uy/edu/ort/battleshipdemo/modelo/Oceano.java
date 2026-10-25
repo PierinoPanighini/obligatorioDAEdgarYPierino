@@ -44,41 +44,101 @@ public class Oceano {
         return cuadrantes[fila][columna];
     }
 
+    public synchronized List<Cuadrante> listarCuadrantesOcupados() {
+        List<Cuadrante> ocupados = new ArrayList<>();
+        for (int fila = 0; fila < filas; fila++) {
+            for (int columna = 0; columna < columnas; columna++) {
+                Cuadrante cuadrante = getCuadrante(fila, columna);
+                if (cuadrante.estaOcupado()) {
+                    ocupados.add(cuadrante);
+                }
+            }
+        }
+        return ocupados;
+    }
+
     public boolean estaDentro(int fila, int columna) {
         return fila >= 0 && fila < filas && columna >= 0 && columna < columnas;
     }
 
-    public void ubicar(Barco barco, int fila, int columna, Orientacion orientacion) throws BatallaNavalException {
-        List<Cuadrante> lugar = new ArrayList<>();
-        for (int i = 0; i < barco.getTamanio(); i++) {
-            int f = fila;
-            int c = columna;
-            if (orientacion == Orientacion.HORIZONTAL) {
-                c += i; // el barco siempre crece hacia la derecha si es horizontal
-            } else {
-                f += i;// el barco siempre crece hacia arriba si es vertical
-            }
-            if (!estaDentro(f, c)) {// si el barco queda fuera del oceano.
-                throw new BatallaNavalException("El barco queda fuera del océano");
-            }
-            if (hayBarcoCerca(f, c)) {// si hay un barco pegado o superpuesto.
-                throw new BatallaNavalException("El barco no puede tocar ni superponerse con otro barco");
-            }
-            lugar.add(cuadrantes[f][c]);// agrego a la lista de cuadrantes que ocupará el barco
-        }
-        barco.ubicar(lugar, orientacion); // si todo estuvo bien ubico el barco en los cuadrantes correspondientes
-
+    // Se valida toda la ubicacion antes de modificar el barco o el tablero.
+    public synchronized void colocarBarco(Barco barco, Cuadrante proa, Orientacion orientacion)
+            throws BatallaNavalException {
+        validarSolicitud(barco, proa, orientacion);
+        List<Cuadrante> candidatos = calcularCuadrantes(barco, proa, orientacion);
+        validarCuadrantesLibres(candidatos);
+        validarSeparacion(candidatos);
+        barco.ubicar(candidatos, orientacion);
     }
 
-    private boolean hayBarcoCerca(int fila, int columna) {
-        for (int f = fila - 1; f <= fila + 1; f++) {
-            for (int c = columna - 1; c <= columna + 1; c++) {
-                if (estaDentro(f, c) && cuadrantes[f][c].estaOcupado()) {
-                    return true; // corto la busqueda si hay barco cerca.
+    private void validarSolicitud(Barco barco, Cuadrante proa, Orientacion orientacion)
+            throws BatallaNavalException {
+        if (barco == null) {
+            throw new BatallaNavalException("Debe seleccionar un barco.");
+        }
+        if (proa == null) {
+            throw new BatallaNavalException("Debe seleccionar un cuadrante de proa.");
+        }
+        if (orientacion == null) {
+            throw new BatallaNavalException("Debe seleccionar una orientacion.");
+        }
+        if (barco.estaUbicado()) {
+            throw new BatallaNavalException("El barco ya esta ubicado.");
+        }
+        if (barco.getTipoBarco() == null || barco.getTamanio() <= 0) {
+            throw new BatallaNavalException("El barco debe tener un tipo y un tamanio valido.");
+        }
+        int fila = proa.getFila();
+        int columna = proa.getColumna();
+        if (!estaDentro(fila, columna) || getCuadrante(fila, columna) != proa) {
+            throw new BatallaNavalException("La proa no pertenece a este oceano.");
+        }
+    }
+
+    private List<Cuadrante> calcularCuadrantes(Barco barco, Cuadrante proa, Orientacion orientacion)
+            throws BatallaNavalException {
+        List<Cuadrante> candidatos = new ArrayList<>();
+        for (int i = 0; i < barco.getTamanio(); i++) {
+            int fila = proa.getFila();
+            int columna = proa.getColumna();
+            if (orientacion == Orientacion.VERTICAL) {
+                fila = fila + i;
+            }
+            if (orientacion == Orientacion.HORIZONTAL) {
+                columna = columna + i;
+            }
+            if (!estaDentro(fila, columna)) {
+                throw new BatallaNavalException("El barco queda fuera de los limites del oceano.");
+            }
+            candidatos.add(getCuadrante(fila, columna));
+        }
+        return candidatos;
+    }
+
+    private void validarCuadrantesLibres(List<Cuadrante> candidatos) throws BatallaNavalException {
+        for (Cuadrante cuadrante : candidatos) {
+            if (cuadrante.estaOcupado()) {
+                throw new BatallaNavalException("El barco se superpone con otro barco.");
+            }
+        }
+    }
+
+    private void validarSeparacion(List<Cuadrante> candidatos) throws BatallaNavalException {
+        for (Cuadrante cuadrante : candidatos) {
+            for (int deltaFila = -1; deltaFila <= 1; deltaFila++) {
+                for (int deltaColumna = -1; deltaColumna <= 1; deltaColumna++) {
+                    if (deltaFila != 0 || deltaColumna != 0) {
+                        int filaVecina = cuadrante.getFila() + deltaFila;
+                        int columnaVecina = cuadrante.getColumna() + deltaColumna;
+                        if (estaDentro(filaVecina, columnaVecina)
+                                && getCuadrante(filaVecina, columnaVecina).estaOcupado()) {
+                            throw new BatallaNavalException(
+                                    "Debe haber al menos un cuadrante de agua entre los barcos, tambien en diagonal.");
+                        }
+                    }
+
                 }
             }
         }
-        return false; // devuelvo falso si no hay barco cerca.
     }
-
 }
