@@ -1,5 +1,60 @@
 package uy.edu.ort.battleshipdemo.modelo;
 
+import java.util.List;
+
 public class Fachada {
+    private static Fachada instanciaFachada;
+
+
+    private SistemaBatallas sistemaBatallas = new SistemaBatallas();
+
+    private Fachada() {
+    }
+
+    public static Fachada getInstancia() {
+        if (instanciaFachada == null) {
+            instanciaFachada = new Fachada();
+        }
+        return instanciaFachada;
+    }
+
+
+    public void cargarDatosIniciales() throws BatallaNavalException {
+        Precargas.cargar(sistemaBatallas);
+    }
+
+
+    //CU1
+    public List<Batalla> listarBatallas() {
+        return sistemaBatallas.listarBatallas();
+    }
+
+    public Batalla buscarBatalla(int id) throws BatallaNavalException {
+        return sistemaBatallas.buscarBatalla(id);
+    }
+
+    public int contarBatallasGanadas() {
+        return sistemaBatallas.contarBatallasGanadas();
+    }
+
+    public int contarBatallasPerdidas() {
+        return sistemaBatallas.contarBatallasPerdidas();
+    }
+
+    public double calcularExitoCampania() {
+        return sistemaBatallas.calcularExitoCampania();
+    }
+    
+    // Datos precargados (tipos barcos y tácticas)
+    public List<TipoBarco> listarTiposBarco() {
+        return sistemaBatallas.listarTiposBarco();
+    }
+
+    public List<Tactica> listarTacticas() {
+        return sistemaBatallas.listarTacticas();
+    }
+
+    
+    
 
 }

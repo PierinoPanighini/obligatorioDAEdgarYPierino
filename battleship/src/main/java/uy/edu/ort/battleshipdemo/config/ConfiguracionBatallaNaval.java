@@ -4,16 +4,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import uy.edu.ort.battleshipdemo.modelo.BatallaNavalException;
-import uy.edu.ort.battleshipdemo.modelo.Precargas;
-import uy.edu.ort.battleshipdemo.modelo.SistemaBatallas;
+import uy.edu.ort.battleshipdemo.modelo.Fachada;
 
 @Configuration
 public class ConfiguracionBatallaNaval {
 
     @Bean
-    public SistemaBatallas sistemaBatallas() throws BatallaNavalException {
-        SistemaBatallas sistema = new SistemaBatallas();
-        Precargas.cargar(sistema);
-        return sistema;
+    public Fachada fachada() throws BatallaNavalException {
+        Fachada fachada = Fachada.getInstancia();
+        fachada.cargarDatosIniciales();
+        return fachada;
     }
 }
