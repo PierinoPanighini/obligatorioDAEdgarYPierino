@@ -28,7 +28,7 @@ public class Precargas {
         ubicarFlotasDeEjemplo(combate);
         precargarRonda(combate, combate.getOceanoMaquina().getCuadrante(2, 2), true);
         precargarRonda(combate, combate.getOceanoMaquina().getCuadrante(0, 0), true);
-        combate.setEstado(EstadoBatalla.EN_COMBATE);
+        combate.setEstado(new EstadoEnCombate(combate));
         sistema.registrarBatalla(combate);
 
         Batalla ganada = crearBatalla("Isla Victoria", 10, 8, espiral, crucero, submarino);
@@ -38,7 +38,7 @@ public class Precargas {
             Cuadrante objetivo = ganada.getOceanoMaquina().getCuadrante(objetivos[i][0], objetivos[i][1]);
             precargarRonda(ganada, objetivo, i < objetivos.length - 1);
         }
-        ganada.setEstado(EstadoBatalla.GANADA);
+        ganada.setEstado(new EstadoTerminada(ganada));
         sistema.registrarBatalla(ganada);
 
         Batalla perdida = crearBatalla("Punta Brava", 10, 10, secuencial, crucero, submarino);
@@ -47,7 +47,7 @@ public class Precargas {
             Cuadrante objetivo = buscarAguaLibre(perdida.getOceanoMaquina());
             precargarRonda(perdida, objetivo, true);
         }
-        perdida.setEstado(EstadoBatalla.PERDIDA);
+        perdida.setEstado(new EstadoTerminada(perdida));
         sistema.registrarBatalla(perdida);
     }
 
@@ -76,7 +76,7 @@ public class Precargas {
         oceano.colocarBarco(barco, oceano.getCuadrante(fila, columna), orientacion);
     }
 
-    // Construye el historial de las precargas. La operacion de juego se implementara en Batalla.
+    // Construye directamente el historial de ejemplo antes de asignar su estado final.
     private static void precargarRonda(Batalla batalla, Cuadrante objetivoJugador, boolean respondeMaquina)
             throws BatallaNavalException {
         Disparo disparoJugador = disparar(objetivoJugador, batalla.getBajasEnemigas());

@@ -34,11 +34,23 @@ public class SistemaBatallas {
     }
 
     public int contarBatallasGanadas() {
-        return contarBatallas(EstadoBatalla.GANADA);
+        int cantidad = 0;
+        for (Batalla batalla : batallas) {
+            if (batalla.fueGanada()) {
+                cantidad++;
+            }
+        }
+        return cantidad;
     }
 
     public int contarBatallasPerdidas() {
-        return contarBatallas(EstadoBatalla.PERDIDA);
+        int cantidad = 0;
+        for (Batalla batalla : batallas) {
+            if (batalla.fuePerdida()) {
+                cantidad++;
+            }
+        }
+        return cantidad;
     }
 
     public double calcularExitoCampania() {
@@ -51,16 +63,6 @@ public class SistemaBatallas {
         }
 
         return ganadas * 100.0 / terminadas;
-    }
-
-    private int contarBatallas(EstadoBatalla estado) {
-        int cantidad = 0;
-        for (Batalla batalla : batallas) {
-            if (batalla.getEstado() == estado) {
-                cantidad++;
-            }
-        }
-        return cantidad;
     }
 
     // Tipos barco

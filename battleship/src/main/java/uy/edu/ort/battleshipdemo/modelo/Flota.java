@@ -38,6 +38,15 @@ public class Flota {
         return new Flota(equivalentes);
     }
 
+    public boolean estaCompletamenteUbicada() {
+        for (Barco barco : barcos) {
+            if (!barco.estaUbicado()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public boolean quedoTodaHundida() {
         for (Barco barco : barcos) {
             if (!barco.estaHundido()) {
