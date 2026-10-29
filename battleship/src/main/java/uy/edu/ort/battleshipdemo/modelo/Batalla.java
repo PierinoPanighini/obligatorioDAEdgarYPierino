@@ -36,7 +36,7 @@ public class Batalla {
         this.lugar = lugar;
         this.jugador = jugador;
         this.maquina = maquina;
-        this.estado = EstadoBatalla.EN_PREPARACION;
+        this.estado = new EstadoEnPreparacion(this);
         this.rondas = new ArrayList<>();
         this.bajasEnemigas = new ArrayList<>();
         this.bajasAmigas = new ArrayList<>();
@@ -46,17 +46,66 @@ public class Batalla {
         return proximoId++;
     }
 
-    public synchronized void colocarBarco(Barco barco, Cuadrante proa, Orientacion orientacion)
-            throws BatallaNavalException {
-        if (estado != EstadoBatalla.EN_PREPARACION) {
-            throw new BatallaNavalException("Solo se pueden colocar barcos durante la preparacion.");
-        }
-        if (!jugador.getFlota().getBarcos().contains(barco)) {
-            throw new BatallaNavalException("No puede ubicar un barco que no pertenece a su flota.");
-        }
-        jugador.getOceano().colocarBarco(barco, proa, orientacion);
+    public enum Estados {
+        EN_PREPARACION, // sin barcos posicionados o posicionándolos (CU02)
+        EN_COMBATE, // se están jugando rondas (CU03)
+        TERMINADA
     }
 
+    public synchronized void colocarBarco(Barco barco, Cuadrante proa, Orientacion orientacion)
+            throws BatallaNavalException {
+        estado.colocarBarco(barco, proa, orientacion);
+    }
+
+    public synchronized void colocarFlotaMaquina() throws BatallaNavalException {
+        estado.colocarFlotaMaquina();
+    }
+
+    public synchronized void validarFlotasColocadas() throws BatallaNavalException {
+        if (!jugador.getFlota().estaCompletamenteUbicada()) {
+            throw new BatallaNavalException("Faltan barcos por colocar en la flota del jugador.");
+        }
+        if (!maquina.getFlota().estaCompletamenteUbicada()) {
+            throw new BatallaNavalException("Faltan barcos por colocar en la flota de la maquina.");
+        }
+    }
+
+    // La solicitud debe traer el numero de ronda que estaba mostrando la vista.
+    public synchronized void generarDisparo(int fila, int columna, int numeroRondaEsperado)
+            throws BatallaNavalException {
+        if (numeroRondaEsperado != rondas.size() + 1) {
+            throw new BatallaNavalException(
+                    "La ronda indicada ya no corresponde. Actualice la informacion de la batalla.");
+        }
+        estado.disparar(fila, columna);
+    }
+
+    public synchronized int getNumeroProximaRonda() {
+        return rondas.size() + 1;
+    }
+
+    public synchronized boolean fueGanada() {
+        return estado.getEstado() == Estados.TERMINADA
+                && bajasEnemigas.size() > bajasAmigas.size();
+    }
+
+    public synchronized boolean fuePerdida() {
+        return estado.getEstado() == Estados.TERMINADA
+                && bajasAmigas.size() > bajasEnemigas.size();
+    }
+
+    public synchronized void iniciarCombate()
+            throws BatallaNavalException {
+        estado.iniciarCombate();
+    }
+
+    // SETTERS
+
+    protected synchronized void setEstado(EstadoBatalla estado) {
+        this.estado = estado;
+    }
+
+    // GETTERS
     public int getId() {
         return id;
     }
@@ -93,12 +142,8 @@ public class Batalla {
         return maquina.getOceano();
     }
 
-    public EstadoBatalla getEstado() {
-        return estado;
-    }
-
-    public void setEstado(EstadoBatalla estado) {
-        this.estado = estado;
+    public synchronized Estados getEstado() {
+        return estado.getEstado();
     }
 
     public List<Ronda> getRondas() {
@@ -113,32 +158,4 @@ public class Batalla {
         return bajasAmigas;
     }
 
-    // Ronda completa: dispara el jugador y, si no gano, responde la maquina con su tactica.
-    public synchronized void disparar(int fila, int columna) throws BatallaNavalException {
-        if (estado != EstadoBatalla.EN_COMBATE) {
-            throw new BatallaNavalException("La batalla no está en combate.");
-        }
-        Disparo disparoJugador = disparar(maquina.getOceano().getCuadrante(fila, columna));
-        if (disparoJugador.getResultado() == ResultadoDisparo.HUNDIDO) {
-            bajasEnemigas.add(disparoJugador.getCuadrante().getBarco());
-        }
-        Disparo disparoMaquina = null;
-        if (maquina.getFlota().quedoTodaHundida()) {
-            estado = EstadoBatalla.GANADA;
-        } else {
-            Cuadrante elegido = maquina.getTactica().elegirCuadrante();
-            disparoMaquina = disparar(elegido);
-            if (jugador.getFlota().quedoTodaHundida()) {
-                estado = EstadoBatalla.PERDIDA;
-            }
-        }
-        rondas.add(new Ronda(rondas.size() + 1, disparoJugador, disparoMaquina));
-    }
-
-    // Disparar es igual para el humano y para la máquina: solo cambia quién elige
-    // el cuadrante.
-    private Disparo disparar(Cuadrante cuadrante) throws BatallaNavalException {
-        ResultadoDisparo resultado = cuadrante.recibirDisparo();
-        return new Disparo(cuadrante, resultado);
-    }
 }

@@ -201,7 +201,8 @@ class OceanoColocacionTest {
         Barco barco = batalla.getFlotaJugador().getBarcos().get(0);
         Oceano oceano = batalla.getOceanoJugador();
         List<Barco> antes = ocupacion(oceano);
-        for (EstadoBatalla estado : List.of(EstadoBatalla.EN_COMBATE, EstadoBatalla.GANADA, EstadoBatalla.PERDIDA)) {
+        for (EstadoBatalla estado : List.of(
+                new EstadoEnCombate(batalla), new EstadoTerminada(batalla))) {
             batalla.setEstado(estado);
             assertThrows(BatallaNavalException.class,
                     () -> batalla.colocarBarco(barco, oceano.getCuadrante(2, 2), Orientacion.HORIZONTAL));

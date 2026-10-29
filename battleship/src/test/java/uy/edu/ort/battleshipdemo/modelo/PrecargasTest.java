@@ -23,7 +23,7 @@ class PrecargasTest {
     }
 
     @Test
-    void cargaCatalogosYCuatroEstadosConParticipantesIndependientes() throws Exception {
+    void cargaCatalogosYCuatroBatallasConParticipantesIndependientes() throws Exception {
         SistemaBatallas sistema = cargar();
         Map<String, Integer> tipos = new HashMap<>();
         for (TipoBarco tipo : sistema.listarTiposBarco()) {
@@ -38,7 +38,7 @@ class PrecargasTest {
         }
         assertEquals(Set.of(TacticaSecuencial.class, TacticaEspiral.class, TacticaCazaAtaque.class), tacticas);
         assertEquals(4, sistema.listarBatallas().size());
-        Set<EstadoBatalla> estados = EnumSet.noneOf(EstadoBatalla.class);
+        Set<Batalla.Estados> estados = EnumSet.noneOf(Batalla.Estados.class);
         Set<Integer> ids = new HashSet<>();
         Set<String> lugares = new HashSet<>();
         Set<Tactica> instancias = new HashSet<>();
@@ -63,7 +63,7 @@ class PrecargasTest {
             }
             assertTrue(tamanios.size() >= 2);
         }
-        assertEquals(EnumSet.allOf(EstadoBatalla.class), estados);
+        assertEquals(EnumSet.allOf(Batalla.Estados.class), estados);
         assertEquals(1, sistema.contarBatallasGanadas());
         assertEquals(1, sistema.contarBatallasPerdidas());
         assertEquals(50.0, sistema.calcularExitoCampania());
@@ -72,7 +72,7 @@ class PrecargasTest {
     @Test
     void posicionesYEstadosCoincidenConLasReglasDelJuego() throws Exception {
         for (Batalla batalla : cargar().listarBatallas()) {
-            boolean preparacion = batalla.getEstado() == EstadoBatalla.EN_PREPARACION;
+            boolean preparacion = batalla.getEstado() == Batalla.Estados.EN_PREPARACION;
             verificarFlota(batalla.getFlotaJugador(), batalla.getOceanoJugador(), preparacion);
             verificarFlota(batalla.getFlotaMaquina(), batalla.getOceanoMaquina(), preparacion);
             boolean propiaHundida = batalla.getFlotaJugador().getBarcos().stream().allMatch(Barco::estaHundido);
@@ -82,8 +82,8 @@ class PrecargasTest {
             } else {
                 assertFalse(batalla.getRondas().isEmpty());
             }
-            assertEquals(batalla.getEstado() == EstadoBatalla.PERDIDA, propiaHundida);
-            assertEquals(batalla.getEstado() == EstadoBatalla.GANADA, enemigaHundida);
+            assertEquals(batalla.fuePerdida(), propiaHundida);
+            assertEquals(batalla.fueGanada(), enemigaHundida);
         }
     }
 
@@ -140,7 +140,8 @@ class PrecargasTest {
                 verificarDisparo(ronda.getDisparoJugador(), batalla.getOceanoMaquina(), tirosJugador,
                         impactosEnemigos, bajasEnemigas);
                 if (ronda.getDisparoMaquina() == null) {
-                    assertEquals(EstadoBatalla.GANADA, batalla.getEstado());
+                    assertEquals(Batalla.Estados.TERMINADA, batalla.getEstado());
+                    assertTrue(batalla.fueGanada());
                     assertEquals(batalla.getRondas().size() - 1, i);
                     assertTrue(batalla.getFlotaMaquina().getBarcos().stream()
                             .allMatch(b -> impactosEnemigos.getOrDefault(b, 0) == b.getTamanio()));
